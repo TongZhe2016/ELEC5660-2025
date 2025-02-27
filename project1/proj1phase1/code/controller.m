@@ -86,6 +86,12 @@ function [F, M] = controller(t, s, s_des)
     psi_acc_psi = Kp_psi * EulerAngleClamp(psi_des-psi) + Kd_psi * (psi_v_des - omega(3)); % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
     omega_v_des =[phi_acc_psi; theta_acc_psi; psi_acc_psi];
     M=I*omega_v_des+cross(omega,I*omega);
+    %% 计算实际轨迹和目标轨迹之间的MSE
+    global mse
+    if isempty(mse)
+        mse = 0.0;
+    end
+    mse = mse + sum((s(1:3)-s_des(1:3)).^2);
 end
 
 

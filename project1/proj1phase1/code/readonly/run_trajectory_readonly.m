@@ -4,7 +4,7 @@
 function run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10,trajectory_generator)
 
 % Sensor parameters
-fnoise = 01;           % Standard deviation of gaussian noise for external disturbance (N)
+fnoise = 1;           % Standard deviation of gaussian noise for external disturbance (N)
 ifov   = 90;          % Camera field of view
 
 % Initialize simulation
