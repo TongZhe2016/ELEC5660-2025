@@ -1,3 +1,7 @@
+%% 实现一个串级PID控制器，控制无人机的位置和姿态
+% 输入：当前时间t，当前状态s，目标状态s_des
+% 输出：总推力F和总力矩M，并非无人机的四个电机的输出
+% 无人机的状态s和目标状态s_des的定义如下：
 % s(1:3) 实际位置
 % s(4:6) 实际速度
 % s(7:10) 实际姿态四元数
@@ -48,12 +52,12 @@ function [F, M] = controller(t, s, s_des)
     [phi, theta, psi] = RotToRPY_ZXY(quaternion_to_R(q));
     omega = [s(11);s(12);s(13)];
     
-    % desired angles: phi, theta, psi
+    % 目标角度：phi, theta, psi
     phi_des = 1/g*(acc_des(1)*sin(psi)-acc_des(2)*cos(psi));
     theta_des = 1/g*(acc_des(1)*cos(psi)+acc_des(2)*sin(psi));
     psi_des = s_des(10);
     
-    % desired angular velocities: phi_v, theta_v, psi_v
+    % 目标角速度：phi_v, theta_v, psi_v
     global phi_last_des theta_last_des
     phi_v_des = EulerAngleClamp(phi_des - phi_last_des) / dt; % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
     theta_v_des = EulerAngleClamp(theta_des - theta_last_des) / dt; % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
@@ -77,9 +81,9 @@ function [F, M] = controller(t, s, s_des)
     Kd_theta = 80;
     Kd_psi = 62.5;
 
-    phi_acc_psi = Kp_phi * EulerAngleClamp(phi_des-phi) + Kd_phi * (phi_v_des - omega(1));
-    theta_acc_psi = Kp_theta * EulerAngleClamp(theta_des-theta) + Kd_theta * (theta_v_des - omega(2));
-    psi_acc_psi = Kp_psi * EulerAngleClamp(psi_des-psi) + Kd_psi * (psi_v_des - omega(3));
+    phi_acc_psi = Kp_phi * EulerAngleClamp(phi_des-phi) + Kd_phi * (phi_v_des - omega(1)); % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
+    theta_acc_psi = Kp_theta * EulerAngleClamp(theta_des-theta) + Kd_theta * (theta_v_des - omega(2)); % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
+    psi_acc_psi = Kp_psi * EulerAngleClamp(psi_des-psi) + Kd_psi * (psi_v_des - omega(3)); % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
     omega_v_des =[phi_acc_psi; theta_acc_psi; psi_acc_psi];
     M=I*omega_v_des+cross(omega,I*omega);
 end
