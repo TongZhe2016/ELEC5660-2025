@@ -1,6 +1,5 @@
-[toc]
-# Source code for ELEC5660-2021
-
+# Source code for ELEC5660-2025
+——A branch of [ELEC 5660-2021 by Garyandtang](https://github.com/Garyandtang/ELEC5660-2021)
 Source code of ELEC5660 Introduction to Aerial Robotics by [Prof. Shaojie Shen](https://facultyprofiles.ust.hk/profiles.php?profile=shaojie-shen-eeshaojie/) at HKUST.
 
 C++ for Project 2-4, Matlab for Project 1.
@@ -75,65 +74,6 @@ The project 3 is done in **ROS ** with offline dataset. The code is done with C+
 ![phase_2](project3/project3phase2/img/AEKF_simple.png)
 
 ![phase_2](project3/project3phase2/img/AEKF_vo.png)
-
-## Folder Structure
-
-```
-.
-├── project1
-│   ├── proj1phase1
-│   │   ├── assignment.pdf
-│   │   ├── code
-│   │   ├── proj1phase1.md
-│   │   ├── Project 1 Phase 1_Report_Jiawei_Tang.pdf
-│   │   └── README.txt
-│   ├── proj1phase2
-│   │   ├── assignment.pdf
-│   │   ├── code
-│   │   ├── Project 1 Phase 2_Jiawei_Tang.pdf
-│   │   └── README.txt
-│   └── proj1phase3
-│       ├── assignment.pdf
-│       ├── code
-│       ├── project1pahse3_Jiawei.md
-│       ├── project1pahse3_Jiawei.pdf
-│       └── README.txt
-├── project2
-│   ├── project2phase1
-│   │   ├── aruco-1.2.4
-│   │   ├── assignment.pdf
-│   │   ├── project2pahse1_jiawei.pdf
-│   │   ├── readme.md
-│   │   └── tag_detector
-│   └── project2phase2
-│       ├── assignment.pdf
-│       ├── camera_models
-│       ├── img
-│       ├── project2pahse2_Jiawei.md
-│       ├── project2pahse2_Jiawei.pdf
-│       ├── readme.md
-│       └── stereo_vo_estimator
-├── project3
-│   ├── project3phase1
-│   │   ├── assignment.pdf
-│   │   ├── ekf
-│   │   ├── img
-│   │   ├── project3pahse1_Jiawei.md
-│   │   ├── project3pahse1_Jiawei.pdf
-│   │   ├── readme.md
-│   │   └── script
-│   └── project3phase2
-│       ├── aug_ekf
-│       ├── img
-│       ├── project3pahse2_Jiawei.md
-│       ├── project3pahse2_Jiawei.pdf
-│       ├── readme.md
-│       ├── stereo_vo
-│       └── tag_detector
-├── readme.md
-└── testing
-    └── angular_velocity.m
-```
 
 ## Academic Integrity Policy
 
