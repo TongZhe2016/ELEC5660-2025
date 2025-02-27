@@ -1,120 +1,94 @@
+% s(1:3) 实际位置
+% s(4:6) 实际速度
+% s(7:10) 实际姿态四元数
+% s(11:13) 实际角速度（欧拉角）
+    
+% s_des(1:3) 目标位置
+% s_des(4:6) 目标速度
+% s_des(7:9) 目标加速度
+% s_des(10) 目标偏航角（欧拉角）
+% s_des(11) 目标偏航角速度（欧拉角）
 function [F, M] = controller(t, s, s_des)
 
-global params
+    global params
+    m = params.mass;
+    g = params.grav;
+    I = params.I;
+    
+    F = 1.0; M = [0.0, 0.0, 0.0]'; % You should calculate the output F and M
+    %% 获得位置误差和速度误差
+    position_error = s_des(1:3) - s(1:3);
+    velocity_error = s_des(4:6) - s(4:6);
+    
+    global 	last_t position_error_int
+    if isempty(last_t)
+        last_t = t;
+    end
+    dt = t - last_t;
+    last_t = t;
+    if isempty(position_error_int)
+        position_error_int = [0.0, 0.0, 0.0]';
+    end
+    position_error_int =  dt * position_error +position_error_int;
 
-m = params.mass;
-g = params.grav;
-I = params.I;
 
-% s(1:3) current position
-% s(4:6) current velocity
-% s(7:10) current attitude quaternion
-% s(11:13) current body angular velocity
+    %% 位置环，输出总竖直推力
+    Kp_position = [5.0, 9.0, 18.5]'; % xyz position proportional gain
+    Ki_position = [0.00001, 0.00001, 0.00001]'; % xyz position integral gain
+    Kd_position = [7.0, 7.0, 22.0]'; % xyz position derivative(velocity) gain
+    
+    % PID 控制器，在目标加速度的基础上加上控制的xyz方向的加速度
+    acc_des = s_des(7:9) + Kp_position.*position_error + Ki_position.*position_error_int + Kd_position.*velocity_error;
+    F = m*(g+acc_des(3));
 
-% s_des(1:3) desire position
-% s_des(4:6) desire velocity
-% s_des(7:9) desire acceleration
-% s_des(10) desire yaw
-% s_des(11) desire yaw rate
 
-F = 1.0; M = [0.0, 0.0, 0.0]'; % You should calculate the output F and M
-debug_flag = 0;
-%% errors 
-e_p = s_des(1:3) - s(1:3);
-e_v = s_des(4:6) - s(4:6);
+    %% 姿态环，使用位置环的输出作为目标加速度
+    % 获得实际姿态角度和角速度
+    q = s(7:10);
+    [phi, theta, psi] = RotToRPY_ZXY(quaternion_to_R(q));
+    omega = [s(11);s(12);s(13)];
+    
+    % desired angles: phi, theta, psi
+    phi_des = 1/g*(acc_des(1)*sin(psi)-acc_des(2)*cos(psi));
+    theta_des = 1/g*(acc_des(1)*cos(psi)+acc_des(2)*sin(psi));
+    psi_des = s_des(10);
+    
+    % desired angular velocities: phi_v, theta_v, psi_v
+    global phi_last_des theta_last_des
+    phi_v_des = EulerAngleClamp(phi_des - phi_last_des) / dt; % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
+    theta_v_des = EulerAngleClamp(theta_des - theta_last_des) / dt; % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
+    phi_last_des = phi_des;
+    theta_last_des = theta_des;
+    psi_v_des = s_des(11);
+    
+    % 调姿态环用，将目标姿态、角速度设置为0
+    % phi_des = 0.0;
+    % theta_des = 0.0;
+    % psi_des = 0.0;
+    % phi_v_des = 0.0;
+    % theta_v_des = 0.0;
+    % psi_v_des = 0.0;
 
-global 	T_pre e_p_int count P_MSE_list V_MSE_list  P_RMS V_RMS
-P_RMS = P_RMS + e_p'*e_p;
-V_RMS = V_RMS + e_v'*e_v;
-P_MSE_list = [P_MSE_list;e_p'*e_p];
-V_MSE_list = [V_MSE_list; e_v'*e_v];
-disp("Postion_MSE: "+num2str( e_p'*e_p));
-disp("Velocity_MSE: "+num2str(e_v'*e_v));
-dt = t - T_pre;
-T_pre = t;
-e_p_int =  dt * e_p +e_p_int;
-count = count + 1;
-%% position control
-% parameters
-k_p_p_1 = 5; % position control K_p
-k_p_p_2 = 9; % position control K_p
-k_p_p_3 = 18.5; % position control K_p
-k_p_i_1 = 0.00001; % position control K_i
-k_p_i_2 = 0.00001; % position control K_i
-k_p_i_3 = 0.00001; % position control K_i
-k_p_d_1 = 7; % position control K_d
-k_p_d_2 = 7; % position control K_d
-k_p_d_3 =  22; % position control K_d
+    % parameters
+    Kp_phi = 312.5;
+    Kp_theta = 125;
+    Kp_psi = 250;
+    Kd_phi = 80;
+    Kd_theta = 80;
+    Kd_psi = 62.5;
 
-% kp = 2.1;
-% k_p_d_3 = kp*8.8;
-% k_p_d_2 = kp*3.2;
-% k_p_d_1 = kp*3.2;
-% k_p_p_3 = kp*7.4;
-% k_p_p_2 = kp*2.55;
-% k_p_p_1 = kp*2.75;
-% k_p_i_3 = 0.0;
-% k_p_i_2 = 0.01;
-% k_p_i_1 = 0.01;
-
-% PID controller  p_ddot_c_i denotes \ddot{p}_{i,c} 
-p_ddot_c_1 = s_des(7) + k_p_d_1*e_v(1) + k_p_p_1*e_p(1) + k_p_i_1*e_p_int(1);
-p_ddot_c_2 = s_des(8) + k_p_d_2*e_v(2) + k_p_p_2*e_p(2) + k_p_i_2*e_p_int(2);
-p_ddot_c_3 = s_des(9) + k_p_d_3*e_v(3) + k_p_p_3*e_p(3) + k_p_i_3*e_p_int(3); 
-F = m*(g+p_ddot_c_3);
-if debug_flag == 1
-    disp(['x_dse ', num2str(s_des(7)),' x_ddot ',num2str(p_ddot_c_1)]);
-    disp(['y_dse ', num2str(s_des(8)),' y_ddot ',num2str(p_ddot_c_2)]);
-end
-%% attitute control
-% quaternion to phi, theta, psi
-q = s(7:10);
-[phi, theta, psi] = RotToRPY_ZXY(quaternion_to_R(q));
-
-% dot phi, theta, psi
-phi_dot = s(11);
-theta_dot = s(12);
-psi_dot = s(13);
-omega = [s(11);s(12);s(13)];
-
-% commanded phi, theta, psi
-phi_c = 1/g*(p_ddot_c_1*sin(psi)-p_ddot_c_2*cos(psi));
-theta_c = 1/g*(p_ddot_c_1*cos(psi)+p_ddot_c_2*sin(psi));
-psi_c = s_des(10);
-
-% commanded dot phi, theta, psi
-global phi_c_pre theta_c_pre
-phi_dot_c = EulerAngleClamp(phi_c - phi_c_pre)/dt;
-theta_dot_c = EulerAngleClamp(theta_c -theta_c_pre)/dt;
-phi_c_pre = phi_c;
-theta_c_pre = theta_c;
-psi_dot_c = s_des(11);
-
-% parameters
-ko = 2.5;
-k_phi_p = 312.5;
-k_theta_p = 125;
-k_psi_p = 250;
-k_phi_d =80;
-k_theta_d = 80;
-k_psi_d =62.5;
-% ko = 2.5;
-% k_phi_p  = ko*125;
-% k_theta_p = ko*125;
-% k_psi_p = ko*120;
-% k_phi_d =ko*32.0;
-% k_theta_d = ko*32.0;
-% k_psi_d = ko*24.0;% K_d_the
-% PID controller 
-phi_ddot_c = k_phi_p*EulerAngleClamp(phi_c-phi)+k_phi_d*(phi_dot_c-phi_dot);
-theta_ddot_c = k_theta_p*EulerAngleClamp(theta_c-theta)+k_theta_d*(theta_dot_c-theta_dot);
-psi_ddot_c = k_psi_p*EulerAngleClamp(psi_c-psi)+k_psi_d*(psi_dot_c-psi_dot);
-omega_dot_c =[phi_ddot_c;theta_ddot_c;psi_ddot_c];
-
-M=I*omega_dot_c+cross(omega,I*omega);
+    phi_acc_psi = Kp_phi * EulerAngleClamp(phi_des-phi) + Kd_phi * (phi_v_des - omega(1));
+    theta_acc_psi = Kp_theta * EulerAngleClamp(theta_des-theta) + Kd_theta * (theta_v_des - omega(2));
+    psi_acc_psi = Kp_psi * EulerAngleClamp(psi_des-psi) + Kd_psi * (psi_v_des - omega(3));
+    omega_v_des =[phi_acc_psi; theta_acc_psi; psi_acc_psi];
+    M=I*omega_v_des+cross(omega,I*omega);
 end
 
+
+%% [1]Function from https://github.com/Garyandtang/ELEC5660-2021 By Garyandtang, 2021
+% This function is used to clamp the angle to [-pi, pi]
+% works well when the angle change suddenly, for example, from pi to -pi, which are actually the same angle
+% However, if we do not implement this function, the drone will try to rotate from pi to -pi, which is not what we want
 function [result] =  EulerAngleClamp(angle)
-result = atan2(sin(angle), cos(angle));
+    result = atan2(sin(angle), cos(angle));
 end
-
