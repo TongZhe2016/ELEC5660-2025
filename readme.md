@@ -27,7 +27,9 @@ The project 1 is done in **MATLAB simulator**, where I implemented 1) Quadrotor 
 
 #### Phase 1 Result (PID)
 
-![phase_1](project1/proj1phase1/code/img/diamond.jpg)
+![phase_1](project1/proj1phase1/figure/diamond.png)
+
+![phase_1](project1/proj1phase1/figure/figure8.png)
 
 #### Phase 2 Result (PID+Trajectory Generation)
 
