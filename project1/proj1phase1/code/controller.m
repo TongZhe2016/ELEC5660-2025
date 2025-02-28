@@ -34,7 +34,9 @@ function [F, M] = controller(t, s, s_des)
         position_error_int = [0.0, 0.0, 0.0]';
     end
     position_error_int =  dt * position_error +position_error_int;
-
+    %% 简单的低通滤波，效果不好，不建议使用
+    % alpha = 1; % 滤波器系数
+    % position_error_filtered = alpha * position_error + (1 - alpha) * position_error_int;
 
     %% 位置环，输出总竖直推力
     Kp_position = [5.0, 9.0, 18.5]'; % xyz position proportional gain
@@ -42,7 +44,7 @@ function [F, M] = controller(t, s, s_des)
     Kd_position = [7.0, 7.0, 22.0]'; % xyz position derivative(velocity) gain
     
     % PID 控制器，在目标加速度的基础上加上控制的xyz方向的加速度
-    acc_des = s_des(7:9) + Kp_position.*position_error + Ki_position.*position_error_int + Kd_position.*velocity_error;
+    acc_des = s_des(7:9) + Kp_position.*position_error_filtered + Ki_position.*position_error_int + Kd_position.*velocity_error;
     F = m*(g+acc_des(3));
 
 

@@ -18,7 +18,7 @@ h10 = subplot(3,4,12);
 set(gcf, 'Renderer', 'painters');
 
 % Run Trajectory  three trajectories, test one by one
-run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, @figure8_trajectory);
+run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, @hover_trajectory);
 
 global mse
 mse = mse/(25/0.01);
