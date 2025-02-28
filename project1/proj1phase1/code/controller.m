@@ -35,13 +35,13 @@ function [F, M] = controller(t, s, s_des)
     end
     position_error_int =  dt * position_error +position_error_int;
     %% 简单的低通滤波，效果不好，不建议使用
-    % alpha = 1; % 滤波器系数
-    % position_error_filtered = alpha * position_error + (1 - alpha) * position_error_int;
+    alpha = 1; % 滤波器系数
+    position_error_filtered = alpha * position_error + (1 - alpha) * position_error_int;
 
     %% 位置环，输出总竖直推力
-    Kp_position = [5.0, 9.0, 18.5]'; % xyz position proportional gain
-    Ki_position = [0.00001, 0.00001, 0.00001]'; % xyz position integral gain
-    Kd_position = [7.0, 7.0, 22.0]'; % xyz position derivative(velocity) gain
+    Kp_position = [6.0, 10.0, 20]'; % xyz position proportional gain
+    Ki_position = [0.0001, 0.0001, 0.0001]'; % xyz position integral gain
+    Kd_position = [7.0, 7.0, 23.0]'; % xyz position derivative(velocity) gain
     
     % PID 控制器，在目标加速度的基础上加上控制的xyz方向的加速度
     acc_des = s_des(7:9) + Kp_position.*position_error_filtered + Ki_position.*position_error_int + Kd_position.*velocity_error;
@@ -76,12 +76,12 @@ function [F, M] = controller(t, s, s_des)
     % psi_v_des = 0.0;
 
     % parameters
-    Kp_phi = 312.5;
-    Kp_theta = 125;
-    Kp_psi = 250;
-    Kd_phi = 80;
-    Kd_theta = 80;
-    Kd_psi = 62.5;
+    Kp_phi = 315.0;
+    Kp_theta = 130.0;
+    Kp_psi = 250.0;
+    Kd_phi = 80.0;
+    Kd_theta = 80.0;
+    Kd_psi = 65.0;
 
     phi_acc_psi = Kp_phi * EulerAngleClamp(phi_des-phi) + Kd_phi * (phi_v_des - omega(1)); % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
     theta_acc_psi = Kp_theta * EulerAngleClamp(theta_des-theta) + Kd_theta * (theta_v_des - omega(2)); % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
