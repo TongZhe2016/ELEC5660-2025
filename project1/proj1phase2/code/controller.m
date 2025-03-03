@@ -24,7 +24,7 @@ function [F, M] = controller(t, s, s_des)
     position_error = s_des(1:3) - s(1:3);
     velocity_error = s_des(4:6) - s(4:6);
     
-    global 	last_t position_error_int
+    persistent 	last_t position_error_int
     if isempty(last_t)
         last_t = t;
     end
@@ -60,7 +60,7 @@ function [F, M] = controller(t, s, s_des)
     psi_des = s_des(10);
     
     % 目标角速度：phi_v, theta_v, psi_v
-    global phi_last_des theta_last_des
+    persistent phi_last_des theta_last_des
     phi_v_des = EulerAngleClamp(phi_des - phi_last_des) / dt; % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
     theta_v_des = EulerAngleClamp(theta_des - theta_last_des) / dt; % 使用Garyandtang的EulerAngleClamp函数[1]将角度限制在[-pi, pi]之间
     phi_last_des = phi_des;
