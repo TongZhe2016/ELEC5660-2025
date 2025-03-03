@@ -84,7 +84,9 @@ ehpx       = [];
 ehpy       = [];
 ehpz       = [];
 
-
+% Calculate RMSE
+global current_states
+global desired_states
 % Start Simulation run_trajectory_readonly
 disp('Start Simulation ...');
 while (1)
@@ -100,7 +102,9 @@ while (1)
     
     des_s = trajectory_generator(time);
     [F,M] = controller(time, true_s, des_s);
-    
+    [~,~,curr_yaw] = RotToRPY_ZXY( quaternion_to_R(true_s(7:10)));
+    current_states = [current_states;true_s(1:3)',true_s(4:6)',curr_yaw];
+    desired_states = [desired_states;des_s(1:3)',des_s(4:6)',des_s(10)];
     if time >= time_tol
         break;
     end;    
@@ -114,7 +118,7 @@ while (1)
         if ~vis_init 
             grid on;    
             axis equal;        
-            axis ([-10 10 -10 10 -1 4]);
+            axis ([-10 10 -10 10 -1 7]);
         end
         %plot3(des_s(1),des_s(2),des_s(3),'m-');
         ll = 0.175;
