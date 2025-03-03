@@ -4,62 +4,22 @@ close all;
 clear all;
 clc;
 addpath('./utils','./readonly');
-    
-path1 = [0.0 0.0 0.0 ; ...
-         0.0 0.0 1.0 ; ...
-         1.0 1.0 1.0 ; ...
-         -1.0 2.3 1.0 ; ...
-         1.0 3.0 1.4 ; ...
-         -1.6 4.0 1.0 ; ...
-         1.0 5.3 1.0 ; ...
-         -1.0 6.9 1.0 ; ...
-         1.0 7.1 1.0 ; ...
-         -1.4 8.0 1.0 ; ...
-         1.0 9.0 1.6 ;];
-
-path2 = [0.0 0.0 0.0 ; ...
-         1.0 1.0 0.0 ; ...
-        -1.0 1.0 2.0 ; ...
-       -1.0 -1.0 2.0 ; ...
-        1.0 -1.0 2.0 ; ...
-        0.0 0.0 4.0 ; ...
-        3.0 2.7 4.0 ; ...
-        1.0 2.0 6.0 ; ...
-        0.0 0.0 6.0 ; ...
-        1.0 1.0 6.0 ];
-
-% Please design 2 sets of waypoints below...
-    
-h1 = subplot(3,3,1);
-h2 = subplot(3,3,2);
-h3 = subplot(3,3,3);
-h4 = subplot(3,3,4);
-h5 = subplot(3,3,5);
-h6 = subplot(3,3,6);
-h7 = subplot(3,3,7);
-h8 = subplot(3,3,8);
-h9 = subplot(3,3,9);
+figure(1)
+h1 = subplot(3,4,1);
+h2 = subplot(3,4,2);
+h3 = subplot(3,4,3);
+h4 = subplot(3,4,4);
+h5 = subplot(3,4,6);
+h6 = subplot(3,4,7);
+h7 = subplot(3,4,8);
+h8 = subplot(3,4,10);
+h9 = subplot(3,4,11);
+h10 = subplot(3,4,12);
 set(gcf, 'Renderer', 'painters');
-set(gcf, 'Position', [100, 100, 1400, 1000]);
-% set(gcf, 'WindowStyle','Modal');
 
+% Run Trajectory  three trajectories, test one by one
+run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, @figure8_trajectory);
 
-% Trajectory Generator
-trajectory_generator([], path1, h1);
-%trajectory_generator([], path2, h1);
-
-% Run Trajectory
-run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9);
-
-calculate_RMSE=@(a,b) sqrt(mean((a(:)-b(:)).^2));
-calculate_RMSE_yaw=@(a,b) sqrt(mean(wrapToPi((a(:)-b(:))).^2));
-
-global current_states
-global desired_states
-rmse_p = calculate_RMSE(current_states(:,1:3),desired_states(:,1:3));
-rmse_v = calculate_RMSE(current_states(:,4:6),desired_states(:,4:6));
-rmse_yaw = rad2deg(calculate_RMSE_yaw(current_states(:,7),desired_states(:,7)));
-
-disp(['RMSE Position(m):',num2str(rmse_p)])
-disp(['RMSE Velocity(m/s):',num2str(rmse_v)])
-disp(['RMSE Yaw(deg):',num2str(rmse_yaw)])
+global mse
+mse = mse/(25/0.01);
+fprintf('MSE: %f\n', mse);
