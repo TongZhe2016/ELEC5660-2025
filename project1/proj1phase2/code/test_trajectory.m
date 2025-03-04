@@ -5,6 +5,9 @@ clear all;
 clc;
 addpath('./utils','./readonly');
 
+global time_tol
+time_tol = 25;
+
 path1 = [0.0 0.0 0.0 ; ...
         0.0 0.0 1.0 ; ...
         1.0 1.0 1.0 ; ...
