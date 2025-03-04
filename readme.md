@@ -8,14 +8,14 @@ This year we totally have 4 projects in this course, including
 
 - [x] Project 1 (Control and Planning)
   - [x] PID Quadrotor trajectory tracking control
-  - [x] Minimum snap optimization-based trajectory generation
-  - [x] Optimal path planning (A* + Dijkstra)
-- [x] Project 2 (Visual estimator)
-  - [x] 3D-2D Pose Estimation with Direct  Linear Transform (DLT)
-  - [x] Visual Odometry with Stereo Camera
-- [x] Project 3 (EKF sensor fusion)
-  - [x] EKF for quadrotor state estimation
-  - [x] Augmented EKF with imu, visual odometry, and tag detection
+  - [ ] Minimum snap optimization-based trajectory generation
+  - [ ] Optimal path planning (A* + Dijkstra)
+- [ ] Project 2 (Visual estimator)
+  - [ ] 3D-2D Pose Estimation with Direct  Linear Transform (DLT)
+  - [ ] Visual Odometry with Stereo Camera
+- [ ] Project 3 (EKF sensor fusion)
+  - [ ] EKF for quadrotor state estimation
+  - [ ] Augmented EKF with imu, visual odometry, and tag detection
 - [ ] Project 4 (System integration on-board the drone)
 
 ## Dataset
