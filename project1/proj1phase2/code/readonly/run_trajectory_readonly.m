@@ -1,7 +1,7 @@
 % Used for HKUST ELEC 5660
 
 
-function run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10,trajectory_generator)
+function run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10)
 
 % Sensor parameters
 fnoise = 1;           % Standard deviation of gaussian noise for external disturbance (N)
@@ -99,7 +99,7 @@ while (1)
     true_s = xsave(end,:)';
     time = time + cstep;
 
-    des_s = trajectory_generator(time, true_s);
+    des_s = trajectory_generator(time);
     [F,M] = controller(time, true_s, des_s);
 
     if time >= time_tol
@@ -115,7 +115,7 @@ while (1)
         if ~vis_init
             grid on;
             axis equal;
-            axis ([-5 5 -5 5 -1 4]);
+            axis ([-10 10 -10 10 -1 4]);
         end
         %plot3(des_s(1),des_s(2),des_s(3),'m-');
         ll = 0.175;
@@ -379,7 +379,7 @@ while (1)
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('Y World Position (m)');
-            axis ([0, time_tol, -4, 4]);
+            axis ([0, time_tol, -4, 12]);
         else
             hold on;
             set(thpy, 'XData', [get(thpy, 'XData') time]);
@@ -396,7 +396,7 @@ while (1)
             hold off;
             xlabel('Time (s) [Red: True; Blue: Des]');
             ylabel('Z World Position (m)');
-            axis ([0, time_tol, -4, 4]);
+            axis ([0, time_tol, -4, 12]);
         else
             hold on;
             set(thpz, 'XData', [get(thpz, 'XData') time]);
