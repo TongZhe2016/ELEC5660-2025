@@ -68,7 +68,7 @@ h6 = subplot(3,4,7);
 h7 = subplot(3,4,8);
 h8 = subplot(3,4,10);
 h9 = subplot(3,4,11);
-h10 = subplot(3,4,12);
+% h10 = subplot(3,4,12);
 set(gcf, 'Renderer', 'painters');
 set(gcf, 'Position', [100, 100, 1400, 1000]);
 % set(gcf, 'WindowStyle','Modal');
@@ -91,16 +91,16 @@ switch 1 % Enter the number of the path you want to test (1-5)
 end
 
 % Run Trajectory
-run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10);
+run_trajectory_readonly(h1, h2, h3, h4, h5, h6, h7, h8, h9);
 
-%% RMSE calculated in controller.m
-global rmse_p
-global rmse_v
-global rmse_yaw
+calculate_RMSE=@(a,b) sqrt(mean((a(:)-b(:)).^2));
+calculate_RMSE_yaw=@(a,b) sqrt(mean(wrapToPi((a(:)-b(:))).^2));
 
-rmse_p = rmse_p / (25/0.002);
-rmse_v = rmse_v / (25/0.002);
-rmse_yaw = rmse_yaw / (25/0.002);
+global current_states
+global desired_states
+rmse_p = calculate_RMSE(current_states(:,1:3),desired_states(:,1:3));
+rmse_v = calculate_RMSE(current_states(:,4:6),desired_states(:,4:6));
+rmse_yaw = rad2deg(calculate_RMSE_yaw(current_states(:,7),desired_states(:,7)));
 
 disp(['RMSE Position(m):',num2str(rmse_p)])
 disp(['RMSE Velocity(m/s):',num2str(rmse_v)])
