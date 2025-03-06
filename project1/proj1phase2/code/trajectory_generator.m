@@ -8,7 +8,7 @@
 % s_des(11) 目标偏航角速度（欧拉角）
 
 function s_des = trajectory_generator(t, path)
-global time_tol; % 在test_trajectory.m中定义，并在此函数中、run_trajectory_readonly.m中使用
+time_tol = 25;
 persistent polynomial_indexes
 persistent time_points
 persistent time_intervals
@@ -40,20 +40,19 @@ if nargin > 1
         end
     end
     %% Constraints
-    % model waypoints constraints f_j^{(0)}(T_j)=x_j^{(0)}
-    d_positions = kron(path, ones(2,1));
-    d_positions = d_positions(2:end-1,:);
-    A_positions = zeros(size(d_positions,1),M*N);
+    b_pos_constrain = kron(path, ones(2,1)); % 位置约束
+    b_pos_constrain = b_pos_constrain(2:end-1,:); % 去掉起点和终点
+    A_pos_constrain = zeros(size(b_pos_constrain,1),M*N); % 位置约束矩阵
 
     for i = 1 : M
-        A_positions((1+2*(i-1)):(2+2*(i-1)),(8*i-7):(8*i))= ...
+        A_pos_constrain((1+2*(i-1)):(2+2*(i-1)),(8*i-7):(8*i))= ...
             [1, 0, 0, 0, 0, 0, 0, 0; ...
             1, time_intervals(i)^1,time_intervals(i)^2, time_intervals(i)^3,time_intervals(i)^4,time_intervals(i)^5,time_intervals(i)^6,time_intervals(i)^7];
     end
 
     % 位置、速度、加速度、jerk的连续性约束
     A_continuity = zeros(4*(M-1),M*N);
-    d_continuity = zeros(4*(M-1), size(path,2));
+    b_continuity = zeros(4*(M-1), size(path,2));
     for j = 1 : M-1
         A_continuity((1+4*(j-1)):(4+4*(j-1)),(1+8*(j-1)):(16+8*(j-1)))= ...
             [1, time_intervals(j)^1,time_intervals(j)^2, time_intervals(j)^3,time_intervals(j)^4,time_intervals(j)^5,time_intervals(j)^6,time_intervals(j)^7,-1,0,0,0,0,0,0,0; ...
@@ -61,21 +60,36 @@ if nargin > 1
             0, 0*time_intervals(j)^0,2*time_intervals(j)^0, 6*time_intervals(j)^1,12*time_intervals(j)^2,20*time_intervals(j)^3,30*time_intervals(j)^4,42*time_intervals(j)^5,0,0,-2,0,0,0,0,0;...
             0, 0*time_intervals(j)^0,0*time_intervals(j)^0, 6*time_intervals(j)^0,24*time_intervals(j)^1,60*time_intervals(j)^2,120*time_intervals(j)^3,210*time_intervals(j)^4,0,0,0,-6,0,0,0,0;];
     end
-    A_eq = [A_positions;A_continuity];
-    d_eq = [d_positions;d_continuity];
-    f = zeros(M*N,1);
+    Aeq = [A_pos_constrain;A_continuity];
+    beq = [b_pos_constrain;b_continuity];
+    f = zeros(M*N,1); % 一次项系数向量
     %% 利用MATLAB的quadprog函数求解
     % MATLAB的quadprog函数用于求解二次规划（Quadratic Programming, QP）问题，其核心是优化带有
     % 线性约束的二次目标函数。在无人机轨迹生成场景中，它被用于求解满足连续性约束的最小Snap轨迹多项
-    % 式系数。以下从语法定义、参数解析到实际应用进行分层详解：
-    polynomial_indexes(:,1) = quadprog(Q_all,f,[],[],A_eq,d_eq(:,1)); % x方向
-    polynomial_indexes(:,2) = quadprog(Q_all,f,[],[],A_eq,d_eq(:,2)); % y方向
-    polynomial_indexes(:,3) = quadprog(Q_all,f,[],[],A_eq,d_eq(:,3)); % z方向
+    % 式系数。
+    % quadprog(H, f, A, b, Aeq, beq, lb, ub, x0, options)
+    % H: 二次项系数矩阵（必须对称）
+    % f: 一次项系数向量
+    % A, b: 不等式约束矩阵和向量（A*x ≤ b）
+    % Aeq, beq: 等式约束矩阵和向量（Aeq*x = beq）
+    % lb, ub: 变量下界和上界（lb ≤ x ≤ ub）
+    % x0: 初始猜测解（可选）
+    % options: 优化选项（如算法选择、容差等）
+
+    polynomial_indexes(:,1) = quadprog(Q_all,f,[],[],Aeq,beq(:,1)); % x方向
+    polynomial_indexes(:,2) = quadprog(Q_all,f,[],[],Aeq,beq(:,2)); % y方向
+    polynomial_indexes(:,3) = quadprog(Q_all,f,[],[],Aeq,beq(:,3)); % z方向
 
 else
     %% 当只有一个输入参数时，即t，输出计算好的轨迹s_des
     s_des = zeros(13,1); % 初始化
     for i = 1 : size(time_points,1) % 找到当前时间点t所在的段index
+        % 特殊情况处理：如果t在倒数第二段的时间点之后，即t>=time_points(end-1)，则取最后一段
+        if t >= time_points(end-1)
+            time = time_points(end-1);
+            interval = size(time_points,1)-1;
+            break
+        end
         if t >= time_points(i) && t <time_points(i+1)
             time = time_points(i);
             interval = i;
