@@ -33,7 +33,11 @@ The project 1 is done in **MATLAB simulator**, where I implemented 1) Quadrotor 
 
 #### Phase 2 Result (PID+Trajectory Generation)
 
-![phase_2](project1/proj1phase2/code/img/path4.jpg)
+![phase_2](project1/proj1phase2/imgs/path3.png)
+
+![phase_2](project1/proj1phase2/imgs/path5.png)
+
+![phase_2](project1/proj1phase2/imgs/path6.png)
 
 #### Phase 3 Result (PID+A*+Trajectory Generation)
 
