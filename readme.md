@@ -8,7 +8,7 @@ This year we totally have 4 projects in this course, including
 
 - [x] Project 1 (Control and Planning)
   - [x] PID Quadrotor trajectory tracking control
-  - [ ] Minimum snap optimization-based trajectory generation
+  - [x] Minimum snap optimization-based trajectory generation
   - [ ] Optimal path planning (A* + Dijkstra)
 - [ ] Project 2 (Visual estimator)
   - [ ] 3D-2D Pose Estimation with Direct  Linear Transform (DLT)
