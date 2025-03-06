@@ -1,5 +1,5 @@
 # Source code for ELEC5660-2025
-——A branch of [ELEC 5660-2021 by Garyandtang](https://github.com/Garyandtang/ELEC5660-2021)
+——A reimplementation version of [ELEC 5660-2021 by Garyandtang](https://github.com/Garyandtang/ELEC5660-2021)
 Source code of ELEC5660 Introduction to Aerial Robotics by [Prof. Shaojie Shen](https://facultyprofiles.ust.hk/profiles.php?profile=shaojie-shen-eeshaojie/) at HKUST.
 
 C++ for Project 2-4, Matlab for Project 1.
