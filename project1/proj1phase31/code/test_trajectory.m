@@ -22,10 +22,10 @@ set(gcf, 'Position', [100, 100, 1400, 1000]);
 map1 = [1.0 1.0 1.0 ; ... % start point
        1.0 2.0 1.0 ; ...  %  obstacle
        3.0 3.0 1.0 ; ...  %     .
-       3.0 7.0 1.0 ; ...  %     .
-       1.0 5.0 1.0 ; ...  %     .
+       4.0 3.0 2.0 ; ...  %     .
+       1.0 5.0 1.0 ; ... %     .
        3.0 5.0 1.0 ; ...  %     .
-       2.0 7.0 1.0 ; ...  %  obstcle
+       2.0 7.0 2.0 ; ...  %  obstcle
        2.0 9.0 1.0 ];     % target point
 
 map2 = [1.0 1.0 1.0 ; ...
@@ -36,26 +36,32 @@ map2 = [1.0 1.0 1.0 ; ...
        4.0 5.0 1.0 ; ...  
        3.0 7.0 1.0 ; ...  
        4.0 9.0 1.0 ]; 
-   
-map3 = [[1.0 1.0 1.0]];  % start point
-seeds_A = randi([1 35], 1, 4); % obstacles in the first floor
-seeds_B = randi([35 70], 1, 4); % obstacles in the second floor
-seeds = [seeds_A, seeds_B];
-for i = 1:8
-    %from index to coordinates
-    z_coord = floor(seeds(i)/35)+1;
-    y_coord = floor(mod(seeds(i),35)/5)+2;
-    x_coord = mod(mod(seeds(i),35), 5)+1;
-    map3 = [map3;[x_coord, y_coord, z_coord]]; %  obstcle
-end
-map3 = [map3; [5.0, 9.0, 1.0]]; % target point
-disp(map3);
-
+map3 = [1.0 1.0 2.0 ; ... % start point
+       1.0 2.0 1.0 ; ...  %  obstacle
+       3.0 3.0 1.0 ; ...  %     .
+       4.0 3.0 2.0 ; ...  %     .
+       1.0 5.0 1.0 ; ... %     .
+       3.0 5.0 1.0 ; ...  %     .
+       2.0 7.0 2.0 ; ...  %  obstcle
+       2.0 9.0 1.0 ];     % target point
 test_map = map1;
 
+% global parameters for PID controller
+global T_pre e_p_int phi_c_pre theta_c_pre count P_MSE_list V_MSE_list
+global P_RMS V_RMS
+count = 0;
+T_pre = 0;
+e_p_int = zeros(3,1);
+phi_c_pre = 0;
+theta_c_pre = 0;
+P_MSE_list = [];
+V_MSE_list = [];
+P_RMS = 0;
+V_RMS = 0;
 % Waypoint Generator Using the A*   
 Optimal_path = path_from_A_star(test_map);
-
+the_size = size(Optimal_path);
+Optimal_path = Optimal_path - 0.5 * ones(size(Optimal_path));
 % Trajectory Generator Using waypoint
 trajectory_generator([], Optimal_path, h1, test_map);
 
