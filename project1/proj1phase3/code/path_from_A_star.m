@@ -24,6 +24,7 @@ else
     x_Max = max(map(:,1))+1;
     y_Max = max(map(:,2))+1;
     z_Max = max(map(:,3))+1;
+    z_Min = min(map(:,3))-1;
 end
 % 将所有的点都初始化为2（free）
 MAP = ones(x_Max , y_Max , z_Max);
@@ -70,7 +71,6 @@ while 1
             Optimal_path = [least_f_xyz;Optimal_path];
             if least_f_xyz == Start % 如果回溯到了起点，就结束
                 disp('Path found!');
-                Optimal_path = connect_path(Optimal_path); % 连接路径
                 break
             end
             x = least_f_xyz(1);

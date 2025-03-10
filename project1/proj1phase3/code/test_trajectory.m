@@ -48,10 +48,10 @@ for i = 1:8
     x_coord = mod(mod(seeds(i),35), 5)+1;
     map3 = [map3;x_coord, y_coord, z_coord]; %  obstcle
 end
-map3 = [map3; [5.0, 9.0, 1.0]]; % target point
+map3 = [map3; [5.0, 9.0, 3.0]]; % target point
 disp(map3);
 
-test_map = map2;
+test_map = map3;
 
 % Waypoint Generator Using the A*   
 Optimal_path = path_from_A_star(test_map) - 0.5*ones(size(path_from_A_star(test_map),1),3);
