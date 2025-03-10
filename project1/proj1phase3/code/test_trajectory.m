@@ -37,7 +37,7 @@ map2 = [1.0 1.0 1.0 ; ...
        3.0 7.0 1.0 ; ...  
        4.0 9.0 1.0 ]; 
    
-map3 = [[1.0 1.0 1.0]];  % start point
+map3 = [1.0 1.0 1.0];  % start point
 seeds_A = randi([1 35], 1, 4); % obstacles in the first floor
 seeds_B = randi([35 70], 1, 4); % obstacles in the second floor
 seeds = [seeds_A, seeds_B];
@@ -46,15 +46,15 @@ for i = 1:8
     z_coord = floor(seeds(i)/35)+1;
     y_coord = floor(mod(seeds(i),35)/5)+2;
     x_coord = mod(mod(seeds(i),35), 5)+1;
-    map3 = [map3;[x_coord, y_coord, z_coord]]; %  obstcle
+    map3 = [map3;x_coord, y_coord, z_coord]; %  obstcle
 end
 map3 = [map3; [5.0, 9.0, 1.0]]; % target point
 disp(map3);
 
-test_map = map1;
+test_map = map2;
 
 % Waypoint Generator Using the A*   
-Optimal_path = path_from_A_star(test_map);
+Optimal_path = path_from_A_star(test_map) - 0.5*ones(size(path_from_A_star(test_map),1),3);
 
 % Trajectory Generator Using waypoint
 trajectory_generator([], Optimal_path, h1, test_map);
