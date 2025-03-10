@@ -41,8 +41,9 @@ The project 1 is done in **MATLAB simulator**, where I implemented 1) Quadrotor 
 
 #### Phase 3 Result (PID+A*+Trajectory Generation)
 
-![phase_1](project1/proj1phase3/code/img/path2.jpg)
+![phase_1](project1/proj1phase3/imgs/Img(1).png)
 
+![phase_1](project1/proj1phase3/imgs/Img(6).png)
 ## Project 2 (Visual estimator)
 
 The project 1 is done in **ROS ** with offline dataset. The code is done with C++. Two sub tasks are:
